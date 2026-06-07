@@ -96,6 +96,38 @@ h1 {
   font-size: 18px;
 }
 
+.authors p {
+  margin-bottom: 8px;
+}
+
+.author-names {
+  color: #27342f;
+  font-weight: 650;
+  line-height: 1.75;
+}
+
+.author-names span,
+.author-affiliations span,
+.author-notes span {
+  display: inline-block;
+  margin-left: 0.9em;
+}
+
+.author-affiliations,
+.author-notes {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.author-notes {
+  margin-bottom: 0;
+}
+
+.authors sup {
+  font-size: 0.68em;
+  line-height: 0;
+}
+
 .column.has-text-centered {
   text-align: center;
 }
