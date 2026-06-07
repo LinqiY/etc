@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Two Bridges, One Pathway</title>
+    <meta
+      name="description"
+      content="Project page for Two Bridges, One Pathway: From VLMs to Generalizable VLAs with Embodied Trajectory-Coupled Data."
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="venue">CoRL 2026 Submission</p>
+          <h1>Two Bridges, One Pathway</h1>
+          <p class="subtitle">
+            From VLMs to Generalizable VLAs with Embodied Trajectory-Coupled Data
+          </p>
+          <p class="authors">Anonymous Authors</p>
+          <div class="column has-text-centered" id="resources">
+            <div class="publication-links">
+              <span class="link-block">
+                <a target="_blank" href="assets/main.pdf"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a target="_blank" href="#"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                    <img src="https://huggingface.co/front/assets/huggingface_logo-noborder.svg"
+                    alt="Hugging Face" width="24" style="vertical-align: middle;">
+                  </span>
+                  <span>Data</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a target="_blank" href="#"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a target="_blank" href="#"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-cube"></i>
+                  </span>
+                  <span>Model</span>
+                  </a>
+              </span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="section abstract-section" id="abstract">
+        <div class="abstract-copy">
+          <h2>Abstract</h2>
+          <p>
+            Vision-language models (VLMs) are powerful general-purpose reasoners,
+            yet converting them into robot control policies (VLAs) is surprisingly
+            difficult. The root cause is a two-fold gap: VLMs are trained on
+            internet-scale images with language-understanding objectives, while VLAs
+            must perceive robot scenes and predict motor actions. Fine-tuning a VLM
+            directly on robot action data forces the model to cross both gaps at
+            once&mdash;the learning curve is steep and the rich generalizations learned
+            during pretraining tend to degrade rather than transfer.
+          </p>
+          <p>
+            We argue that this gap can be bridged gradually with the right
+            intermediate data. We introduce <em>embodied trajectory-coupled (ETC)
+            data</em>&mdash;vision-language supervision derived from the same robot
+            scenes and trajectories used for action learning. Because ETC data shares
+            the visual context of robot operation while retaining familiar
+            language-understanding objectives, it provides a natural stepping stone
+            between VLM pretraining and VLA fine-tuning.
+          </p>
+          <p>
+            Building on this, we design a three-stage training recipe.
+            <em>Distribution Bridging</em> first adapt the VLM to embodied
+            visual-language semantics. <em>Objective Bridging</em> then gradually
+            shifts the model toward action prediction while preserving the acquired
+            representations. <em>Retentive Adaptation</em> finally specializes the
+            policy to the target deployment domain. We further show that mixing
+            task-relevant out-of-distribution ETC data with a small amount of action
+            data enables the model to generalize to novel visual-language conditions
+            without requiring additional robot demonstrations. Simulation and
+            real-robot experiments confirm that this gradual bridging strategy is the
+            key to transferring VLM generalization into robust, deployable robot
+            policies.
+          </p>
+        </div>
+      </section>
+
+      <section class="section method-section" id="method">
+        <div class="section-heading">
+          <p class="eyebrow">Method</p>
+          <h2>Method Overview</h2>
+          <p>
+            ETC first moves the VLM onto the embodied visual-language manifold, then
+            preserves this alignment while action prediction is introduced, and finally
+            carries the retained embodied competence into deployment adaptation.
+          </p>
+        </div>
+
+        <div class="method-flow">
+          <article class="method-block">
+            <div class="method-copy">
+              <p class="method-index">1</p>
+              <h3>Dual Mismatch: Why VLMs Do Not Directly Become VLAs</h3>
+              <p>
+                VLM-to-VLA adaptation must cross two mismatches at once: the
+                distribution gap between general web-scale vision-language data and
+                embodied robot scenes, and the objective gap between language
+                understanding and executable action prediction. Action-only training
+                jumps directly across both gaps, while generic multimodal co-training
+                remains distant from robot manipulation. ETC provides the missing
+                intermediate supervision by sharing embodied scene semantics with robot
+                action data while retaining the familiar VLM objective.
+              </p>
+            </div>
+            <figure class="method-figure compact">
+              <img src="assets/main-d-rendered.png" alt="ETC data bridges general VLM data and VLA action data" />
+              <figcaption>Figure 1(d): ETC as intermediate supervision between general VLM data and VLA data.</figcaption>
+            </figure>
+          </article>
+
+          <article class="method-block">
+            <div class="method-copy">
+              <p class="method-index">2</p>
+              <h3>What is ETC?</h3>
+              <p>
+                Embodied Trajectory-Coupled data is vision-language supervision
+                constructed from the same robot scenes and trajectories as action data.
+                It is not action supervision, but it stays manipulation-relevant by
+                sharing embodied scene and trajectory context. ETC forms a graded
+                supervision spectrum: scene-grounding for task-agnostic perception,
+                task-oriented ETC for affordance and planning, and action-aligned
+                planning ETC for motion-coupled future gripper trajectories.
+              </p>
+            </div>
+            <figure class="method-figure wide">
+              <img src="assets/main-b-rendered.png" alt="Examples of scene-grounding, task-oriented, and action-aligned planning ETC" />
+              <figcaption>Figure 1(b): ETC categories progress from scene grounding to task reasoning and motion-coupled planning.</figcaption>
+            </figure>
+          </article>
+
+          <article class="method-block">
+            <div class="method-copy">
+              <p class="method-index">3</p>
+              <h3>Two Bridges: Distribution + Objective Bridging</h3>
+              <p>
+                Because ETC is objective-aligned with VLMs and distribution-aligned
+                with robot data, it supports two explicit bridges. Distribution
+                Bridging adapts the VLM to robot scenes before action learning while
+                keeping the next-token objective unchanged. Objective Bridging then
+                introduces action-token prediction on top of an already embodied
+                representation, with continued ETC co-training preserving embodied
+                alignment during action learning.
+              </p>
+            </div>
+            <figure class="method-figure wide">
+              <img src="assets/main-a-rendered.png" alt="Distribution Bridging and Objective Bridging in the ETC-guided pathway" />
+              <figcaption>Figure 1(a): ETC separates distribution alignment from action grounding.</figcaption>
+            </figure>
+            <div class="bridge-cards">
+              <div>
+                <h4>Distribution Bridging</h4>
+                <p>ETC-only training moves the VLM from general visual-language data to embodied robot scenes.</p>
+              </div>
+              <div>
+                <h4>Objective Bridging</h4>
+                <p>Action + ETC co-training introduces action prediction while anchoring the representation to embodied scenes.</p>
+              </div>
+            </div>
+          </article>
+
+          <article class="method-block">
+            <div class="method-copy">
+              <p class="method-index">4</p>
+              <h3>One Pathway toward Generalizable VLAs</h3>
+              <p>
+                These two bridges form one continuous pathway from VLM initialization
+                to deployable VLA policies. Retentive Adaptation continues pairing
+                action data with target-scene ETC, preserving reusable embodied
+                competence while expanding the policy capability boundary. The pathway
+                does not force a VLM to become a robot policy in one jump; ETC guides
+                the model through embodied alignment, action grounding, and deployment
+                adaptation.
+              </p>
+            </div>
+            <figure class="method-figure compact">
+              <img src="assets/main-c-rendered.png" alt="ETC pathway provides a smoother route toward generalizable VLA policies" />
+              <figcaption>Figure 1(c): ETC gives a smoother optimization route than direct action-only adaptation.</figcaption>
+            </figure>
+          </article>
+        </div>
+      </section>
+
+      <section class="section experiments" id="experiments">
+        <div class="section-heading">
+          <p class="eyebrow">Experiments</p>
+          <h2>Simulation and real-robot results</h2>
+          <p>
+            We evaluate the three-stage ETC pathway on LIBERO, SimplerEnv, VLABench,
+            and real WidowX tasks. The experiments isolate how ETC helps at each
+            adaptation stage: initialization, action learning, and downstream deployment.
+          </p>
+        </div>
+        <div class="experiment-grid">
+          <article class="wide">
+            <h3>Distribution Bridging strengthens the VLM initialization</h3>
+            <p>
+              ETC-based Distribution Bridging injects embodied task
+              structure into the VLM representation, improves held-out embodied
+              understanding, and gives stronger downstream action-learning results than
+              raw PaliGemma. General VLM pretraining is still insufficient: the best
+              initialization requires adapting the visual-language backbone to embodied
+              manipulation scenes, including the visual tower.
+            </p>
+            <div class="figure-stack">
+              <figure>
+                <img src="assets/vlm-init-v2.png" alt="Distribution bridging analysis for VLM initialization" />
+                <figcaption>Figure 2: Distribution Bridging aligns the VLM to the embodied manifold.</figcaption>
+              </figure>
+              <figure class="table-figure">
+                <img
+                  class="table-image"
+                  src="assets/table-vla-sr-cotrain.png"
+                  alt="Table 1 comparing Stage 2 supervision strategies across Distribution Bridging settings"
+                />
+                <figcaption>Table 1: Stage 2 supervision strategies across Distribution Bridging settings.</figcaption>
+              </figure>
+            </div>
+          </article>
+          <article class="wide">
+            <h3>Objective Bridging preserves embodied alignment under action learning</h3>
+            <p>
+              Action-only Objective Bridging causes the backbone to drift
+              from the embodied representation learned in Stage 1, while ETC
+              co-training keeps the representation closer and improves policy success,
+              especially on VLABench. The ETC categories are complementary:
+              action-aligned planning gives the strongest execution signal,
+              task-oriented ETC improves intention understanding, scene-grounding ETC
+              provides broad perceptual support, and full ETC gives the strongest
+              overall in-domain result.
+            </p>
+            <div class="figure-combo">
+              <figure>
+                <img src="assets/midtrain-cka.png" alt="CKA comparison for action-only and ETC co-training" />
+                <figcaption>Figure 3(a): CKA to the Distribution-Bridged VLM.</figcaption>
+              </figure>
+              <figure>
+                <img
+                  class="table-image"
+                  src="assets/table-objective-bridging.png"
+                  alt="Figure 3b VLABench ETC category ablation table"
+                />
+                <figcaption>Figure 3(b): VLABench performance under ETC category ablations.</figcaption>
+              </figure>
+            </div>
+          </article>
+          <article class="wide">
+            <h3>Retentive Adaptation expands capability without knowledge erosion</h3>
+            <p>
+              Downstream adaptation extends capability without eroding
+              previously learned embodied competence only when ETC is retained through
+              the pathway. Real-robot results show that continuing ETC through Stage 2
+              and Stage 3 is strongest, while adding ETC only at Stage 3 is less
+              effective. For unseen visual-language conditions, OOD ETC further
+              improves generalization by redirecting attention from distractors to the
+              requested target, without requiring matching OOD action demonstrations.
+            </p>
+            <div class="figure-combo">
+              <figure>
+                <img
+                  class="table-image"
+                  src="assets/table-retentive-ablation.png"
+                  alt="Figure 4a three-stage ETC adaptation ablation table on WidowX"
+                />
+                <figcaption>Figure 4(a): three-stage ETC adaptation ablation on WidowX.</figcaption>
+              </figure>
+              <figure>
+                <img src="assets/posttrain-heatmap_v2.png" alt="Attention heatmaps under OOD targets" />
+                <figcaption>Figure 4(b): attention heatmaps under OOD targets.</figcaption>
+              </figure>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section class="section video-section" id="video">
+        <div class="section-heading centered">
+          <p class="eyebrow">Video Presentation</p>
+          <h2>Project video</h2>
+        </div>
+        <video class="project-video" controls preload="metadata" poster="assets/corl26-poster.jpg">
+          <source src="assets/corl26.mp4" type="video/mp4" />
+          <source src="assets/corl26.mov" type="video/quicktime" />
+          Your browser does not support embedded video. You can open the
+          <a href="assets/corl26.mp4">project video</a> directly.
+        </video>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>Two Bridges, One Pathway: From VLMs to Generalizable VLAs with ETC Data</p>
+      <p class="muted">Resource links are placeholders for release.</p>
+    </footer>
+  </body>
+</html>
